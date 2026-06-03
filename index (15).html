@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Benefits Enrollment Cost Tool</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#BF912F;--navy:#003B56;--teal:#2DA693;--blue:#5B9BD5;
+  --gold-light:#F7EDD6;--navy-light:#E6EEF2;--teal-light:#DCF2EF;--blue-light:#E8F1FA;
+  --gold-dark:#7A5C1A;--navy-dark:#00243A;--teal-dark:#1A6B60;--blue-dark:#2D5F8A;
+  --border:#e2e6ea;--card:#fff;--text:#1a1a1a;--muted:#6b7280;--bg:#f4f6f8;
+  --red-light:#FEE2E2;--red-dark:#991B1B;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);padding:24px 16px 48px;color:var(--text)}
+.wrap{max-width:720px;margin:0 auto}
+.hband{background:var(--navy);border-radius:12px;padding:1.1rem 1.5rem;margin-bottom:1rem;display:flex;align-items:center;gap:12px}
+.hband h1{font-size:17px;font-weight:500;color:#E6EEF2}
+.hband p{font-size:12px;color:#8aafc0;margin-top:2px}
+.tabs{display:flex;margin-bottom:1rem;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.tb{flex:1;padding:10px 4px;font-size:11px;font-weight:500;cursor:pointer;border:none;border-right:1px solid var(--border);background:var(--card);color:var(--muted);transition:all .15s}
+.tb:last-child{border-right:none}
+.tb.on{background:var(--navy);color:#E6EEF2}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.slabel{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pl{border:1px solid var(--border);border-radius:20px;padding:7px 14px;font-size:13px;cursor:pointer;background:var(--card);color:var(--muted);transition:all .15s}
+.pl:hover{border-color:var(--teal);color:var(--teal-dark);background:var(--teal-light)}
+.pl.on{background:var(--teal-light);border-color:var(--teal);color:var(--teal-dark);font-weight:500}
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:.75rem}
+.plan-card{border:2px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:all .15s;background:var(--card)}
+.plan-card:hover{border-color:var(--teal)}
+.plan-card.sel{border-color:var(--teal);background:var(--teal-light)}
+.plan-card.waived{border-color:#EF4444;background:var(--red-light);opacity:.7;pointer-events:none}
+.plan-name{font-size:14px;font-weight:500;color:var(--navy-dark);margin-bottom:4px}
+.plan-price{font-size:22px;font-weight:500;color:var(--teal-dark);margin-bottom:2px}
+.plan-price span{font-size:12px;color:var(--muted);font-weight:400}
+.plan-tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;margin-top:6px;font-weight:500}
+.tag-hdhp{background:var(--gold-light);color:var(--gold-dark)}
+.tag-ppo{background:var(--navy-light);color:var(--navy-dark)}
+.tag-surest{background:var(--teal-light);color:var(--teal-dark)}
+.tag-guardian{background:var(--blue-light);color:var(--blue-dark)}
+.tag-vision{background:var(--gold-light);color:var(--gold-dark)}
+.waive-btn{width:100%;padding:8px;border-radius:8px;border:1px dashed #EF4444;background:transparent;color:#EF4444;font-size:13px;cursor:pointer;transition:all .15s;margin-top:.25rem}
+.waive-btn:hover{background:var(--red-light)}
+.waive-btn.active{background:var(--red-light);border-style:solid;font-weight:500}
+.summary-box{background:var(--navy);border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.summary-total{font-size:36px;font-weight:500;color:#E6EEF2}
+.summary-label{font-size:13px;color:#8aafc0;margin-top:2px;margin-bottom:1rem}
+.summary-row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+.summary-row:last-child{border-bottom:none}
+.summary-row .label{color:#8aafc0}
+.summary-row .val{color:#E6EEF2;font-weight:500}
+.annual-box{display:flex;gap:10px;margin-top:1rem;flex-wrap:wrap}
+.ann-item{flex:1;min-width:80px;background:rgba(255,255,255,.08);border-radius:8px;padding:.75rem;text-align:center}
+.ann-val{font-size:15px;font-weight:500;color:#E6EEF2}
+.ann-label{font-size:11px;color:#8aafc0;margin-top:2px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:.75rem}
+.detail-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.detail-head{font-size:12px;font-weight:500;color:var(--navy-dark);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.detail-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;color:var(--muted);gap:8px}
+.detail-row .dval{color:var(--text);font-weight:500;text-align:right}
+.tipbox{border-left:3px solid var(--gold);background:var(--gold-light);padding:11px 14px;font-size:13px;color:var(--gold-dark);line-height:1.6;margin-top:.75rem}
+.notice-box{border-left:3px solid var(--blue);background:var(--blue-light);padding:11px 14px;font-size:13px;color:var(--blue-dark);line-height:1.7;margin-top:.75rem}
+.notice-box p{margin-bottom:6px}
+.notice-box p:last-child{margin-bottom:0}
+.compare-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:.5rem}
+.compare-table th{background:var(--navy);color:#E6EEF2;padding:10px 12px;text-align:left;font-weight:500}
+.compare-table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text)}
+.compare-table tr:last-child td{border-bottom:none}
+.compare-table tr:nth-child(even) td{background:#f9fafb}
+.compare-table .highlight{color:var(--teal-dark);font-weight:500}
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500;margin-left:4px}
+.badge-best{background:#dcfce7;color:#166534}
+.hidden{display:none}
+.no-sel{text-align:center;padding:2rem;color:var(--muted);font-size:13px}
+.footer-note{text-align:center;font-size:11px;color:#9ca3af;margin-top:1.5rem;line-height:1.5}
+.section-head{font-size:14px;font-weight:500;color:var(--navy-dark);margin-bottom:.75rem}
+.vis-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:.75rem}
+.vis-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.vis-head{font-size:12px;font-weight:500;color:var(--navy-dark);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.vis-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;color:var(--muted);gap:8px}
+.vis-row .vval{color:var(--text);font-weight:500;text-align:right}
+.total-summary{background:var(--navy);border-radius:12px;padding:1.5rem;margin-bottom:1rem;text-align:center}
+.total-big{font-size:48px;font-weight:500;color:#E6EEF2}
+.total-sub{font-size:14px;color:#8aafc0;margin-top:4px;margin-bottom:1.25rem}
+.total-breakdown{background:var(--card);border-radius:12px;margin-bottom:1rem;overflow:hidden}
+.tb-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px}
+.tb-row:last-child{border-bottom:none}
+.tb-label{color:var(--text);font-weight:500}
+.tb-val{color:var(--teal-dark);font-weight:500}
+.tb-total-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--navy-light);font-size:15px;font-weight:500}
+.tb-total-row .tl{color:var(--navy-dark)}
+.tb-total-row .tv{color:var(--navy-dark);font-size:18px}
+.annual-split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.split-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center}
+.split-val{font-size:22px;font-weight:500;color:var(--navy-dark)}
+.split-label{font-size:12px;color:var(--muted);margin-top:4px}
+.incomplete-note{background:var(--gold-light);border:1px solid var(--gold);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--gold-dark);margin-bottom:1rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hband">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#BF912F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12h6"/><path d="M9 16h4"/></svg>
+  <div><h1>Benefits enrollment cost tool</h1><p>Hanna Andersson · 2025 Benefits · Monthly employee premiums</p></div>
+</div>
+
+<div class="tabs">
+  <button class="tb on" id="t1" type="button">🏥 Medical</button>
+  <button class="tb" id="t2" type="button">🦷 Dental</button>
+  <button class="tb" id="t3" type="button">👁 Vision</button>
+  <button class="tb" id="t4" type="button">📊 Compare</button>
+  <button class="tb" id="t5" type="button">🧾 My total</button>
+</div>
+
+<!-- MEDICAL -->
+<div id="v1">
+  <div class="card">
+    <div class="slabel">Coverage tier</div>
+    <div class="pills">
+      <button class="pl on" data-tier="ee" type="button">Employee only</button>
+      <button class="pl" data-tier="es" type="button">+ Spouse</button>
+      <button class="pl" data-tier="ec" type="button">+ Child(ren)</button>
+      <button class="pl" data-tier="ef" type="button">+ Family</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="slabel">Select a plan — UnitedHealthcare</div>
+    <div class="plan-grid" id="plan-grid"></div>
+    <button class="waive-btn" id="waive-med-btn" type="button">Waive medical coverage</button>
+  </div>
+  <div id="med-summary" class="hidden">
+    <div class="summary-box">
+      <div class="summary-total" id="med-monthly">$0</div>
+      <div class="summary-label">per month · <span id="med-annual-inline"></span> per year</div>
+      <div class="summary-row"><span class="label">Plan</span><span class="val" id="sum-plan">—</span></div>
+      <div class="summary-row"><span class="label">Coverage tier</span><span class="val" id="sum-tier">—</span></div>
+      <div class="summary-row"><span class="label">Network</span><span class="val">UnitedHealthcare</span></div>
+      <div class="annual-box">
+        <div class="ann-item"><div class="ann-val" id="ann-deduct">—</div><div class="ann-label">Deductible</div></div>
+        <div class="ann-item"><div class="ann-val" id="ann-oop">—</div><div class="ann-label">OOP max</div></div>
+        <div class="ann-item"><div class="ann-val" id="ann-pcp">—</div><div class="ann-label">PCP visit</div></div>
+      </div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-card"><div class="detail-head">In-Network</div><div id="in-net-rows"></div></div>
+      <div class="detail-card"><div class="detail-head">Out-of-Network</div><div id="out-net-rows"></div></div>
+    </div>
+    <div class="tipbox" id="med-tip"></div>
+  </div>
+  <div id="med-waived-msg" class="hidden" style="text-align:center;padding:1.5rem;background:var(--red-light);border-radius:12px;color:var(--red-dark);font-size:14px;font-weight:500;margin-bottom:1rem">Medical coverage waived — $0/mo</div>
+  <div id="med-nosel" class="no-sel">Select a plan above or waive coverage.</div>
+</div>
+
+<!-- DENTAL -->
+<div id="v2" class="hidden">
+  <div class="card">
+    <div class="slabel">Coverage tier</div>
+    <div class="pills">
+      <button class="pl on" data-tier2="ee" type="button">Employee only</button>
+      <button class="pl" data-tier2="es" type="button">+ Spouse</button>
+      <button class="pl" data-tier2="ec" type="button">+ Child(ren)</button>
+      <button class="pl" data-tier2="ef" type="button">+ Family</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="slabel">Select a dental plan — Guardian</div>
+    <div class="plan-grid" id="dental-grid"></div>
+    <button class="waive-btn" id="waive-den-btn" type="button">Waive dental coverage</button>
+  </div>
+  <div id="dental-summary" class="hidden">
+    <div class="summary-box">
+      <div class="summary-total" id="den-monthly">$0</div>
+      <div class="summary-label">per month · <span id="den-annual-inline"></span> per year</div>
+      <div class="summary-row"><span class="label">Plan</span><span class="val" id="den-plan-name">—</span></div>
+      <div class="summary-row"><span class="label">Coverage tier</span><span class="val" id="den-tier-name">—</span></div>
+      <div class="summary-row"><span class="label">Network</span><span class="val">Guardian</span></div>
+      <div class="annual-box">
+        <div class="ann-item"><div class="ann-val" id="den-max">—</div><div class="ann-label">Annual max</div></div>
+        <div class="ann-item"><div class="ann-val" id="den-deduct">$50</div><div class="ann-label">Deductible</div></div>
+        <div class="ann-item"><div class="ann-val" id="den-ortho">—</div><div class="ann-label">Orthodontia</div></div>
+      </div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-card"><div class="detail-head">In-Network</div><div id="den-in-rows"></div></div>
+      <div class="detail-card"><div class="detail-head">Out-of-Network</div><div id="den-out-rows"></div></div>
+    </div>
+    <div class="notice-box">
+      <p>✅ You may visit any licensed dentist, in or out of Guardian's network.</p>
+      <p>✅ In-network dentists offer negotiated fees, typically resulting in lower out-of-pocket costs.</p>
+      <p>⚠️ Out-of-network reimbursement is based on Guardian's fee schedule. If your dentist charges more than the allowed amount, you are responsible for the difference.</p>
+      <p>💡 Always confirm your provider is in-network with Guardian. You can request a cost summary before service if going out-of-network.</p>
+    </div>
+  </div>
+  <div id="den-waived-msg" class="hidden" style="text-align:center;padding:1.5rem;background:var(--red-light);border-radius:12px;color:var(--red-dark);font-size:14px;font-weight:500;margin-bottom:1rem">Dental coverage waived — $0/mo</div>
+  <div id="dental-nosel" class="no-sel">Select a dental plan above or waive coverage.</div>
+</div>
+
+<!-- VISION -->
+<div id="v3" class="hidden">
+  <div class="card">
+    <div class="slabel">Coverage tier</div>
+    <div class="pills">
+      <button class="pl on" data-tier3="ee" type="button">Employee only</button>
+      <button class="pl" data-tier3="es" type="button">+ Spouse</button>
+      <button class="pl" data-tier3="ec" type="button">+ Child(ren)</button>
+      <button class="pl" data-tier3="ef" type="button">+ Family</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="slabel">Vision plan — VSP</div>
+    <div class="plan-grid" id="vision-grid"></div>
+    <button class="waive-btn" id="waive-vis-btn" type="button">Waive vision coverage</button>
+  </div>
+  <div id="vis-summary" class="hidden">
+    <div class="summary-box">
+      <div class="summary-total" id="vis-monthly">$0</div>
+      <div class="summary-label">per month · <span id="vis-annual-inline"></span> per year</div>
+      <div class="summary-row"><span class="label">Plan</span><span class="val">VSP Vision</span></div>
+      <div class="summary-row"><span class="label">Coverage tier</span><span class="val" id="vis-tier-name">—</span></div>
+      <div class="annual-box">
+        <div class="ann-item"><div class="ann-val">$10</div><div class="ann-label">Exam copay</div></div>
+        <div class="ann-item"><div class="ann-val">$150</div><div class="ann-label">Frame allowance</div></div>
+        <div class="ann-item"><div class="ann-val">$150</div><div class="ann-label">Contact allowance</div></div>
+      </div>
+    </div>
+    <div class="vis-grid">
+      <div class="vis-card"><div class="vis-head">In-Network</div>
+        <div class="vis-row"><span>Eye exam</span><span class="vval">$10 copay (annually)</span></div>
+        <div class="vis-row"><span>Material copay</span><span class="vval">$25</span></div>
+        <div class="vis-row"><span>Single vision lens</span><span class="vval">$25 copay</span></div>
+        <div class="vis-row"><span>Bifocal lens</span><span class="vval">$25 copay</span></div>
+        <div class="vis-row"><span>Trifocal lens</span><span class="vval">$25 copay</span></div>
+        <div class="vis-row"><span>Lenticular lens</span><span class="vval">$25 copay</span></div>
+        <div class="vis-row"><span>Frames (retail)</span><span class="vval">$150 max + 20% off</span></div>
+        <div class="vis-row"><span>Frames (Costco/Walmart/Sam's)</span><span class="vval">$80 max</span></div>
+        <div class="vis-row"><span>Contacts (elective)</span><span class="vval">$150 max, copay waived</span></div>
+        <div class="vis-row"><span>Contacts (medically necessary)</span><span class="vval">Covered after copay</span></div>
+        <div class="vis-row"><span>Contact fitting & eval</span><span class="vval">Up to $60, 15% off</span></div>
+      </div>
+      <div class="vis-card"><div class="vis-head">Out-of-Network</div>
+        <div class="vis-row"><span>Eye exam</span><span class="vval">Amount over $39</span></div>
+        <div class="vis-row"><span>Single vision lens</span><span class="vval">Up to $23</span></div>
+        <div class="vis-row"><span>Bifocal lens</span><span class="vval">Up to $37</span></div>
+        <div class="vis-row"><span>Trifocal lens</span><span class="vval">Up to $49</span></div>
+        <div class="vis-row"><span>Lenticular lens</span><span class="vval">Up to $64</span></div>
+        <div class="vis-row"><span>Frames</span><span class="vval">Up to $46</span></div>
+        <div class="vis-row"><span>Contacts (elective)</span><span class="vval">Up to $100, copay waived</span></div>
+        <div class="vis-row"><span>Contacts (medically necessary)</span><span class="vval">Up to $210</span></div>
+        <div class="vis-row"><span>Contact fitting & eval</span><span class="vval">Included in allowance</span></div>
+        <div class="vis-row"><span>Costco/Walmart/Sam's</span><span class="vval">Not covered</span></div>
+      </div>
+    </div>
+    <div class="tipbox">VSP vision is very affordable — even family coverage is under $10/month. Annual allowances for frames and contacts make this exceptional value for anyone who wears glasses or contacts.</div>
+  </div>
+  <div id="vis-waived-msg" class="hidden" style="text-align:center;padding:1.5rem;background:var(--red-light);border-radius:12px;color:var(--red-dark);font-size:14px;font-weight:500;margin-bottom:1rem">Vision coverage waived — $0/mo</div>
+  <div id="vis-nosel" class="no-sel">Select a coverage tier above or waive coverage.</div>
+</div>
+
+<!-- COMPARE -->
+<div id="v4" class="hidden">
+  <div class="card">
+    <div class="slabel">Coverage tier</div>
+    <div class="pills">
+      <button class="pl on" data-tier4="ee" type="button">Employee only</button>
+      <button class="pl" data-tier4="es" type="button">+ Spouse</button>
+      <button class="pl" data-tier4="ec" type="button">+ Child(ren)</button>
+      <button class="pl" data-tier4="ef" type="button">+ Family</button>
+    </div>
+  </div>
+  <div class="card" style="overflow-x:auto">
+    <div class="section-head">Medical — UnitedHealthcare</div>
+    <table class="compare-table"><thead><tr><th>Plan</th><th>Monthly</th><th>Annual</th><th>Deductible</th><th>OOP max</th><th>PCP visit</th></tr></thead><tbody id="med-compare-body"></tbody></table>
+  </div>
+  <div class="card" style="overflow-x:auto">
+    <div class="section-head">Dental — Guardian</div>
+    <table class="compare-table"><thead><tr><th>Plan</th><th>Monthly</th><th>Annual</th><th>Annual max</th><th>Major services</th><th>Orthodontia</th></tr></thead><tbody id="den-compare-body"></tbody></table>
+  </div>
+  <div class="card" style="overflow-x:auto">
+    <div class="section-head">Vision — VSP</div>
+    <table class="compare-table"><thead><tr><th>Plan</th><th>Monthly</th><th>Annual</th><th>Exam</th><th>Frame allowance</th><th>Contact allowance</th></tr></thead><tbody id="vis-compare-body"></tbody></table>
+  </div>
+  <div class="tipbox" id="compare-tip"></div>
+</div>
+
+<!-- MY TOTAL -->
+<div id="v5" class="hidden">
+  <div id="incomplete-note" class="incomplete-note hidden">⚠️ You haven't made a selection for all benefits yet. Head back to each tab to select a plan or waive coverage.</div>
+  <div class="total-summary">
+    <div class="total-big" id="grand-total">$0.00</div>
+    <div class="total-sub">estimated monthly premium · <span id="grand-annual"></span> per year</div>
+  </div>
+  <div class="total-breakdown">
+    <div class="tb-row"><span class="tb-label">🏥 Medical</span><span id="tot-med" style="font-size:14px;font-weight:500;color:var(--muted)">Not selected</span></div>
+    <div class="tb-row"><span class="tb-label">🦷 Dental</span><span id="tot-den" style="font-size:14px;font-weight:500;color:var(--muted)">Not selected</span></div>
+    <div class="tb-row"><span class="tb-label">👁 Vision</span><span id="tot-vis" style="font-size:14px;font-weight:500;color:var(--muted)">Not selected</span></div>
+    <div class="tb-total-row"><span class="tl">Total monthly premium</span><span class="tv" id="tot-total">$0.00</span></div>
+  </div>
+  <div class="annual-split">
+    <div class="split-card"><div class="split-val" id="split-monthly">$0.00</div><div class="split-label">Per month</div></div>
+    <div class="split-card"><div class="split-val" id="split-annual">$0.00</div><div class="split-label">Per year</div></div>
+  </div>
+  <div class="tipbox" id="total-tip">Make your selections on the Medical, Dental, and Vision tabs to see your personalised cost summary here.</div>
+</div>
+
+<p class="footer-note">Costs shown are employee monthly premiums (dental and vision converted from biweekly). This tool is for estimation purposes only — refer to your official benefits guide for complete details. Contact HR with questions.</p>
+</div>
+
+<script>
+function bw(n){return n*26/12;}
+function fmt(n){return '$'+n.toFixed(2);}
+
+var medPlans={
+  surest:{name:'Surest',tag:'tag-surest',tagLabel:'Surest',premiums:{ee:34.65,es:127.05,ec:119.55,ef:173.26},deductible:'$0',oop:'$7,000 / $14,000',pcp:'$150 copay',inNet:[['Annual deductible','$0'],['OOP max','$7,000 | $14,000'],['Preventive care','100%'],['PCP visit','$150 copay'],['Specialist visit','$150 copay'],['Inpatient','Up to $5,500/admit']],outNet:[['Annual deductible','$0'],['OOP max','$14,000 | $28,000'],['Preventive care','50%'],['PCP visit','$450 copay'],['Specialist visit','$450 copay'],['Inpatient','Up to $13,000/admit']],tip:'Surest has no deductible and predictable copays — great for frequent doctor visits and cost certainty. Note higher copay amounts vs PPO+.'},
+  ppoplus:{name:'PPO+',tag:'tag-ppo',tagLabel:'PPO+',premiums:{ee:128.44,es:328.74,ec:295.86,ef:466.46},deductible:'$1,500 / $3,000',oop:'$3,000 / $6,000',pcp:'$25 copay',inNet:[['Annual deductible','$1,500 | $3,000'],['OOP max','$3,000 | $6,000'],['Preventive care','100%'],['PCP visit','$25 copay'],['Specialist visit','$40 copay'],['Inpatient','$0 + 10% after deductible']],outNet:[['Annual deductible','$3,000 | $6,000'],['OOP max','$6,000 | $12,000'],['Preventive care','70%'],['PCP visit','+30% after deductible'],['Specialist visit','+30% after deductible'],['Inpatient','+30% after deductible']],tip:'PPO+ has higher premiums but lower copays and a lower OOP max — ideal for those anticipating frequent or complex medical care.'},
+  hdhp:{name:'HDHP',tag:'tag-hdhp',tagLabel:'HDHP + HSA',premiums:{ee:54.16,es:155.72,ec:140.14,ef:213.27},deductible:'$2,000 / $4,000',oop:'$5,500 / $11,000',pcp:'20% after deductible',inNet:[['Annual deductible','$2,000 | $4,000'],['OOP max','$5,500 | $11,000'],['Preventive care','100%'],['PCP visit','20% after deductible'],['Specialist visit','20% after deductible'],['Inpatient','20% after deductible'],['Coinsurance','20%'],['HSA eligible','Yes — employer adds up to $600']],outNet:[['Annual deductible','$2,000 | $4,000'],['OOP max','$6,550 | $13,100'],['Preventive care','60%'],['PCP visit','40% after deductible'],['Specialist visit','40% after deductible'],['Inpatient','40% after deductible'],['Coinsurance','40%']],tip:'HDHP has the lowest premiums and is HSA-eligible. Hanna Andersson contributes up to $600. Best for generally healthy employees who want to save pre-tax dollars.'},
+};
+var dentalPlans={
+  low:{name:'Dental Low',tag:'tag-guardian',tagLabel:'Guardian',premiums:{ee:bw(6.27),es:bw(14.52),ec:bw(15.29),ef:bw(23.72)},annMax:'$1,500 + rollover',deduct:'$50',ortho:'Not covered',inNet:[['Annual deductible','$50'],['Annual maximum','$1,500 + rollover'],['Preventive services','100%'],['Basic services','80%'],['Major services','25%'],['Orthodontia','Not covered']],outNet:[['Annual deductible','$50'],['Annual maximum','$1,500 + rollover'],['Preventive services','80%'],['Basic services','60%'],['Major services','10%'],['Orthodontia','Not covered']],tip:'Dental Low covers routine and basic care well. A good choice if you rarely need major dental work and do not have children who may need braces.'},
+  high:{name:'Dental High',tag:'tag-guardian',tagLabel:'Guardian',premiums:{ee:bw(16.22),es:bw(34.17),ec:bw(37.55),ef:bw(58.09)},annMax:'$2,000 + rollover',deduct:'$50',ortho:'50%, up to $2,000 lifetime (under 19)',inNet:[['Annual deductible','$50'],['Annual maximum','$2,000 + rollover'],['Preventive services','100%'],['Basic services','80%'],['Major services','50%'],['Orthodontia','50%, $2,000 lifetime (under 19)']],outNet:[['Annual deductible','$50'],['Annual maximum','$2,000 + rollover'],['Preventive services','90%'],['Basic services','70%'],['Major services','50%'],['Orthodontia','50%, $2,000 lifetime (under 19)']],tip:'Dental High covers major services at 50% and includes orthodontia for children under 19. Worth it if you anticipate significant dental work or have kids who may need braces.'},
+};
+var visionPlan={name:'VSP Vision',premiums:{ee:bw(1.09),es:bw(2.61),ec:bw(2.67),ef:bw(4.30)}};
+
+var selectedTier='ee',selectedTier2='ee',selectedTier3='ee',selectedTier4='ee';
+var selectedPlan=null,selectedDental=null,selectedVision=false;
+var waivedMed=false,waivedDen=false,waivedVis=false;
+var tierLabels={ee:'Employee only',es:'Employee + Spouse',ec:'Employee + Child(ren)',ef:'Employee + Family'};
+
+function buildPlanGrid(){
+  var g=document.getElementById('plan-grid');g.innerHTML='';
+  Object.keys(medPlans).forEach(function(k){
+    var p=medPlans[k],price=p.premiums[selectedTier];
+    var d=document.createElement('div');d.className='plan-card'+(selectedPlan===k?' sel':'')+(waivedMed?' waived':'');
+    d.innerHTML='<div class="plan-name">'+p.name+'</div><div class="plan-price">'+fmt(price)+'<span>/mo</span></div><div style="font-size:12px;color:var(--muted)">'+fmt(price*12)+'/yr</div><span class="plan-tag '+p.tag+'">'+p.tagLabel+'</span>';
+    d.addEventListener('click',function(){if(waivedMed)return;selectedPlan=k;buildPlanGrid();showMedSummary();});
+    g.appendChild(d);
+  });
+  var wb=document.getElementById('waive-med-btn');
+  wb.classList.toggle('active',waivedMed);
+  wb.textContent=waivedMed?'✓ Medical waived — click to undo':'Waive medical coverage';
+}
+function showMedSummary(){
+  var s=document.getElementById('med-summary'),n=document.getElementById('med-nosel'),w=document.getElementById('med-waived-msg');
+  s.classList.add('hidden');n.classList.add('hidden');w.classList.add('hidden');
+  if(waivedMed){w.classList.remove('hidden');return;}
+  if(!selectedPlan){n.classList.remove('hidden');return;}
+  s.classList.remove('hidden');
+  var p=medPlans[selectedPlan],price=p.premiums[selectedTier];
+  document.getElementById('med-monthly').textContent=fmt(price);
+  document.getElementById('med-annual-inline').textContent=fmt(price*12);
+  document.getElementById('sum-plan').textContent=p.name;
+  document.getElementById('sum-tier').textContent=tierLabels[selectedTier];
+  document.getElementById('ann-deduct').textContent=p.deductible;
+  document.getElementById('ann-oop').textContent=p.oop;
+  document.getElementById('ann-pcp').textContent=p.pcp;
+  var inR=document.getElementById('in-net-rows');inR.innerHTML='';
+  p.inNet.forEach(function(r){inR.innerHTML+='<div class="detail-row"><span>'+r[0]+'</span><span class="dval">'+r[1]+'</span></div>';});
+  var outR=document.getElementById('out-net-rows');outR.innerHTML='';
+  p.outNet.forEach(function(r){outR.innerHTML+='<div class="detail-row"><span>'+r[0]+'</span><span class="dval">'+r[1]+'</span></div>';});
+  document.getElementById('med-tip').textContent=p.tip;
+}
+document.getElementById('waive-med-btn').addEventListener('click',function(){
+  waivedMed=!waivedMed;if(waivedMed)selectedPlan=null;buildPlanGrid();showMedSummary();
+});
+
+function buildDentalGrid(){
+  var g=document.getElementById('dental-grid');g.innerHTML='';
+  Object.keys(dentalPlans).forEach(function(k){
+    var p=dentalPlans[k],price=p.premiums[selectedTier2];
+    var d=document.createElement('div');d.className='plan-card'+(selectedDental===k?' sel':'')+(waivedDen?' waived':'');
+    d.innerHTML='<div class="plan-name">'+p.name+'</div><div class="plan-price">'+fmt(price)+'<span>/mo</span></div><div style="font-size:12px;color:var(--muted)">'+fmt(price*12)+'/yr</div><span class="plan-tag '+p.tag+'">'+p.tagLabel+'</span>';
+    d.addEventListener('click',function(){if(waivedDen)return;selectedDental=k;buildDentalGrid();showDentalSummary();});
+    g.appendChild(d);
+  });
+  var wb=document.getElementById('waive-den-btn');
+  wb.classList.toggle('active',waivedDen);
+  wb.textContent=waivedDen?'✓ Dental waived — click to undo':'Waive dental coverage';
+}
+function showDentalSummary(){
+  var s=document.getElementById('dental-summary'),n=document.getElementById('dental-nosel'),w=document.getElementById('den-waived-msg');
+  s.classList.add('hidden');n.classList.add('hidden');w.classList.add('hidden');
+  if(waivedDen){w.classList.remove('hidden');return;}
+  if(!selectedDental){n.classList.remove('hidden');return;}
+  s.classList.remove('hidden');
+  var p=dentalPlans[selectedDental],price=p.premiums[selectedTier2];
+  document.getElementById('den-monthly').textContent=fmt(price);
+  document.getElementById('den-annual-inline').textContent=fmt(price*12);
+  document.getElementById('den-plan-name').textContent=p.name;
+  document.getElementById('den-tier-name').textContent=tierLabels[selectedTier2];
+  document.getElementById('den-max').textContent=p.annMax;
+  document.getElementById('den-deduct').textContent=p.deduct;
+  document.getElementById('den-ortho').textContent=p.ortho==='Not covered'?'Not covered':'Included';
+  var inR=document.getElementById('den-in-rows');inR.innerHTML='';
+  p.inNet.forEach(function(r){inR.innerHTML+='<div class="detail-row"><span>'+r[0]+'</span><span class="dval">'+r[1]+'</span></div>';});
+  var outR=document.getElementById('den-out-rows');outR.innerHTML='';
+  p.outNet.forEach(function(r){outR.innerHTML+='<div class="detail-row"><span>'+r[0]+'</span><span class="dval">'+r[1]+'</span></div>';});
+}
+document.getElementById('waive-den-btn').addEventListener('click',function(){
+  waivedDen=!waivedDen;if(waivedDen)selectedDental=null;buildDentalGrid();showDentalSummary();
+});
+
+function buildVisionGrid(){
+  var g=document.getElementById('vision-grid');g.innerHTML='';
+  var price=visionPlan.premiums[selectedTier3];
+  var d=document.createElement('div');d.className='plan-card'+(selectedVision&&!waivedVis?' sel':'')+(waivedVis?' waived':'');
+  d.innerHTML='<div class="plan-name">'+visionPlan.name+'</div><div class="plan-price">'+fmt(price)+'<span>/mo</span></div><div style="font-size:12px;color:var(--muted)">'+fmt(price*12)+'/yr</div><span class="plan-tag tag-vision">VSP</span>';
+  d.addEventListener('click',function(){if(waivedVis)return;selectedVision=true;buildVisionGrid();showVisSummary();});
+  g.appendChild(d);
+  var wb=document.getElementById('waive-vis-btn');
+  wb.classList.toggle('active',waivedVis);
+  wb.textContent=waivedVis?'✓ Vision waived — click to undo':'Waive vision coverage';
+}
+function showVisSummary(){
+  var s=document.getElementById('vis-summary'),n=document.getElementById('vis-nosel'),w=document.getElementById('vis-waived-msg');
+  s.classList.add('hidden');n.classList.add('hidden');w.classList.add('hidden');
+  if(waivedVis){w.classList.remove('hidden');return;}
+  if(!selectedVision){n.classList.remove('hidden');return;}
+  s.classList.remove('hidden');
+  var price=visionPlan.premiums[selectedTier3];
+  document.getElementById('vis-monthly').textContent=fmt(price);
+  document.getElementById('vis-annual-inline').textContent=fmt(price*12);
+  document.getElementById('vis-tier-name').textContent=tierLabels[selectedTier3];
+}
+document.getElementById('waive-vis-btn').addEventListener('click',function(){
+  waivedVis=!waivedVis;if(waivedVis)selectedVision=false;buildVisionGrid();showVisSummary();
+});
+
+function buildCompare(){
+  var mb=document.getElementById('med-compare-body');mb.innerHTML='';
+  var medRows=Object.keys(medPlans).map(function(k){return{p:medPlans[k],price:medPlans[k].premiums[selectedTier4]};});
+  var minMed=Math.min.apply(null,medRows.map(function(r){return r.price;}));
+  medRows.forEach(function(r){
+    var best=r.price===minMed?'<span class="badge badge-best">Lowest premium</span>':'';
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td><strong>'+r.p.name+'</strong>'+best+'</td><td class="highlight">'+fmt(r.price)+'</td><td>'+fmt(r.price*12)+'</td><td>'+r.p.deductible+'</td><td>'+r.p.oop+'</td><td>'+r.p.pcp+'</td>';
+    mb.appendChild(tr);
+  });
+  var db=document.getElementById('den-compare-body');db.innerHTML='';
+  var denRows=Object.keys(dentalPlans).map(function(k){return{p:dentalPlans[k],price:dentalPlans[k].premiums[selectedTier4]};});
+  var minDen=Math.min.apply(null,denRows.map(function(r){return r.price;}));
+  denRows.forEach(function(r){
+    var best=r.price===minDen?'<span class="badge badge-best">Lowest premium</span>':'';
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td><strong>'+r.p.name+'</strong>'+best+'</td><td class="highlight">'+fmt(r.price)+'</td><td>'+fmt(r.price*12)+'</td><td>'+r.p.annMax+'</td><td>'+r.p.inNet[4][1]+'</td><td>'+(r.p.ortho==='Not covered'?'Not covered':'Up to $2,000')+'</td>';
+    db.appendChild(tr);
+  });
+  var vb=document.getElementById('vis-compare-body');vb.innerHTML='';
+  var vprice=visionPlan.premiums[selectedTier4];
+  var vtr=document.createElement('tr');
+  vtr.innerHTML='<td><strong>VSP Vision</strong></td><td class="highlight">'+fmt(vprice)+'</td><td>'+fmt(vprice*12)+'</td><td>$10 copay (annually)</td><td>$150 max + 20% off</td><td>$150 max</td>';
+  vb.appendChild(vtr);
+  document.getElementById('compare-tip').textContent='The vision plan is the same for all employees — only the tier changes the premium. At under $10/month even for family coverage, enrollment is strongly recommended for anyone who wears glasses or contacts.';
+}
+
+function buildTotal(){
+  var medDone=waivedMed||selectedPlan!==null;
+  var denDone=waivedDen||selectedDental!==null;
+  var visDone=waivedVis||selectedVision;
+  document.getElementById('incomplete-note').classList.toggle('hidden',medDone&&denDone&&visDone);
+  var medPrice=waivedMed?0:(selectedPlan?medPlans[selectedPlan].premiums[selectedTier]:null);
+  var denPrice=waivedDen?0:(selectedDental?dentalPlans[selectedDental].premiums[selectedTier2]:null);
+  var visPrice=waivedVis?0:(selectedVision?visionPlan.premiums[selectedTier3]:null);
+  var total=(medPrice||0)+(denPrice||0)+(visPrice||0);
+  function rowVal(price,waived){
+    if(waived)return '<span style="color:#EF4444;font-weight:500">Waived — $0</span>';
+    if(price===null)return '<span style="color:var(--muted);font-weight:500">Not selected</span>';
+    return '<span style="color:var(--teal-dark);font-weight:500">'+fmt(price)+'/mo</span>';
+  }
+  document.getElementById('tot-med').innerHTML=rowVal(medPrice,waivedMed);
+  document.getElementById('tot-den').innerHTML=rowVal(denPrice,waivedDen);
+  document.getElementById('tot-vis').innerHTML=rowVal(visPrice,waivedVis);
+  document.getElementById('grand-total').textContent=fmt(total);
+  document.getElementById('grand-annual').textContent=fmt(total*12);
+  document.getElementById('tot-total').textContent=fmt(total);
+  document.getElementById('split-monthly').textContent=fmt(total);
+  document.getElementById('split-annual').textContent=fmt(total*12);
+  var tips=[];
+  if(selectedPlan==='hdhp'&&!waivedMed) tips.push('You selected the HDHP — remember to set up your HSA to take advantage of the pre-tax savings and Hanna Andersson\'s $600 employer contribution.');
+  if(waivedMed) tips.push('You waived medical coverage — make sure you have coverage elsewhere (e.g. through a spouse\'s plan) before your enrollment is final.');
+  if(waivedDen) tips.push('You waived dental — preventive care like cleanings is typically low cost in-network and worth considering.');
+  if(waivedVis) tips.push('You waived vision — VSP coverage starts at just '+fmt(visionPlan.premiums[selectedTier3])+'/mo for your tier, which may be worth it if you wear glasses or contacts.');
+  if(!waivedMed&&!waivedDen&&!waivedVis&&selectedPlan&&selectedDental&&selectedVision) tips.push('Great — you have enrolled in all three benefits! Review your selections before submitting during open enrollment.');
+  document.getElementById('total-tip').textContent=tips.length?tips[0]:'Make your selections on the Medical, Dental, and Vision tabs to see your personalised cost summary here.';
+}
+
+function switchTab(id){
+  ['v1','v2','v3','v4','v5'].forEach(function(v,i){
+    document.getElementById(v).classList.toggle('hidden',v!==id);
+    document.getElementById('t'+(i+1)).classList.toggle('on',('t'+(i+1))===(id.replace('v','t')));
+  });
+  if(id==='v3'){buildVisionGrid();showVisSummary();}
+  if(id==='v4'){buildCompare();}
+  if(id==='v5'){buildTotal();}
+}
+document.getElementById('t1').addEventListener('click',function(){switchTab('v1');});
+document.getElementById('t2').addEventListener('click',function(){switchTab('v2');});
+document.getElementById('t3').addEventListener('click',function(){switchTab('v3');});
+document.getElementById('t4').addEventListener('click',function(){switchTab('v4');});
+document.getElementById('t5').addEventListener('click',function(){switchTab('v5');});
+
+document.querySelectorAll('.pl[data-tier]').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.pl[data-tier]').forEach(function(x){x.classList.remove('on');});btn.classList.add('on');selectedTier=btn.getAttribute('data-tier');buildPlanGrid();showMedSummary();});});
+document.querySelectorAll('.pl[data-tier2]').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.pl[data-tier2]').forEach(function(x){x.classList.remove('on');});btn.classList.add('on');selectedTier2=btn.getAttribute('data-tier2');buildDentalGrid();showDentalSummary();});});
+document.querySelectorAll('.pl[data-tier3]').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.pl[data-tier3]').forEach(function(x){x.classList.remove('on');});btn.classList.add('on');selectedTier3=btn.getAttribute('data-tier3');buildVisionGrid();showVisSummary();});});
+document.querySelectorAll('.pl[data-tier4]').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.pl[data-tier4]').forEach(function(x){x.classList.remove('on');});btn.classList.add('on');selectedTier4=btn.getAttribute('data-tier4');buildCompare();});});
+
+buildPlanGrid();
+buildDentalGrid();
+</script>
+</body>
+</html>
